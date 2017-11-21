@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="piece">
+    <div class="piece-sidebar">
+        <h1>{{ title }}</h1>
+        <h3>{{ rev }}</h3>
+
+        <select id="rev-select">
+            <option value="{{ url_for('piece', title=slug) }}" {% if rev == "current" %}selected=selected{% endif %}>current</option>
+            {% for r in revs %}
+            <option value="{{ url_for('revision', title=slug, rev=r) }}" {% if rev == "rev" + r %}selected=selected{% endif %}>rev{{ r }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="piece-content">
+        {{ content|safe }}
+    </div>
+</div>
+
+<script>
+var rev_select = document.getElementById("rev-select");
+
+rev_select.onchange = function(e) {
+    console.log(e.target.value);
+    window.location.href = e.target.value;
+};
+</script>
+{% endblock %}

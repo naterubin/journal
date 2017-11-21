@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+<ul>
+    {% for slug, title in pieces.items() %}
+    <li><a href="{{ url_for('piece', title=slug) }}">{{ title }}</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}
+

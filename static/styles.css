@@ -1,0 +1,12 @@
+.piece {
+    display: flex;
+}
+
+.piece-sidebar {
+    padding-right: 30px;
+    border-right-style: dotted;
+}
+
+.piece-content {
+    margin-left: 40px;
+}
