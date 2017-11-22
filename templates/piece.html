@@ -4,7 +4,6 @@
 <div class="piece">
     <div class="piece-sidebar">
         <h1>{{ title }}</h1>
-        <h3>{{ rev }}</h3>
 
         <select id="rev-select">
             <option value="{{ url_for('piece', title=slug) }}" {% if rev == "current" %}selected=selected{% endif %}>current</option>
@@ -12,6 +11,9 @@
             <option value="{{ url_for('revision', title=slug, rev=r) }}" {% if rev == "rev" + r %}selected=selected{% endif %}>rev{{ r }}</option>
             {% endfor %}
         </select>
+
+        <h6>Download as:</h6>
+        <a href="?format=md">Markdown</a>
     </div>
 
     <div class="piece-content">
