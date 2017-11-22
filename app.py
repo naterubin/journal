@@ -1,13 +1,23 @@
+from functools import wraps
 from glob import glob
 import os
 
-from flask import Flask, abort, request, render_template, send_file
+from flask import Flask, flash, abort, redirect, request, render_template, send_file, session, url_for
 
 import markdown
 
 app = Flask(__name__)
+app.config.from_pyfile('config.cfg')
 
 WRITINGS_DIR = os.path.join(os.path.dirname(__file__), 'writings')
+
+def requires_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if session.get('logged_in', False):
+            return f(*args, **kwargs)
+        return redirect(url_for('login'))
+    return decorated
 
 def format_title(title):
     return title.replace("_", " ").capitalize()
@@ -47,12 +57,14 @@ def piece_md(title, rev="current"):
     abort(404)
 
 @app.route("/")
+@requires_auth
 def home():
     pieces = os.listdir(WRITINGS_DIR)
     pieces = {p: format_title(p) for p in pieces}
     return render_template('index.html', pieces=pieces)
 
 @app.route("/<string:title>")
+@requires_auth
 def piece(title):
     return_type = request.args.get('format', 'html')
 
@@ -62,6 +74,7 @@ def piece(title):
     return piece_html(title)
 
 @app.route("/<string:title>/rev/<int:rev>")
+@requires_auth
 def revision(title, rev):
     return_type = request.args.get('format', 'html')
 
@@ -90,3 +103,12 @@ def new_piece():
     request.files[piece_title].save(os.path.join(piece_dir, "current.md"))
 
     return '', 201
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        if request.form['password'] == app.config['PASSWORD']:
+            session['logged_in'] = True
+            return redirect(url_for('home'))
+        flash('Wrong password')
+    return render_template('login.html')
